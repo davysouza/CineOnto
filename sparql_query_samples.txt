@@ -1,0 +1,128 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX cinema: <http://www.semanticweb.org/davys/ontologies/2019/10/cinema#>
+
+# Query 1:
+SELECT ?MovieName
+    WHERE {
+        ?instance cinema:directedBy cinema:francis_ford_coppola .
+        ?instance foaf:name ?MovieName .
+    } order by asc(UCASE(str(?MovieName)))
+
+# Query 2:
+SELECT ?FirstName ?LastName ?Character
+    WHERE {
+        ?role a cinema:Role .
+        ?role cinema:onMovie ?movie .
+        ?movie foaf:name "Interstellar"
+        {
+            {
+                ?role cinema:hasActor ?actorActress .
+                ?actorActress foaf:firstName ?FirstName . 
+                ?actorActress foaf:familyName ?LastName . 
+            }
+            UNION
+            {
+                ?role cinema:hasActress ?actorActress .
+                ?actorActress foaf:firstName ?FirstName . 
+                ?actorActress foaf:familyName ?LastName . 
+            }
+        } .
+        ?role cinema:hasCharacter ?Character .
+    } order by asc(UCASE(str(?FirstName))) asc(UCASE(str(?LastName)))
+
+# Query 3:
+SELECT ?Movie ?Director ?Year
+	WHERE { 
+        ?Movie a cinema:Movie .
+        ?Movie cinema:performedBy cinema:al_pacino .
+        ?Movie cinema:performedBy cinema:sofia_coppola .
+        ?Movie cinema:directedBy ?Director . 
+        ?Movie cinema:year ?_Year . 
+        BIND(xsd:integer(?_Year) as ?Year)
+    } order by asc(?release)
+
+# Query 4:
+SELECT DISTINCT ?Movie ?Duration
+	WHERE { 
+        VALUES (?value) {(cinema:al_pacino) (cinema:sofia_coppola)}
+        ?Movie a cinema:Movie .
+        ?Movie cinema:directedBy cinema:francis_ford_coppola .
+        ?Movie cinema:performedBy ?value .
+        ?Movie cinema:duration ?_Duration .
+        BIND(xsd:integer(?_Duration) as ?Duration)
+    } order by asc(?Duration)
+
+# Query 5:
+SELECT DISTINCT ?Person (SAMPLE(?_MoviePer) AS ?MoviePer) (SAMPLE(?_MovieDir) AS ?MovieDir)
+	WHERE { 
+        VALUES (?value) {(cinema:Actress) (cinema:Actor)}
+        ?Person a cinema:Director .
+        ?Person a ?value .
+        ?_MoviePer cinema:performedBy ?Person .
+        ?_MovieDir cinema:directedBy ?Person
+    } GROUP BY ?Person
+
+# Query 6:
+SELECT DISTINCT ?Year ?Director ?Movie 
+	WHERE { 
+        ?Movie a cinema:Movie .
+        ?Movie cinema:year ?year .
+        FILTER(?year > 2000 && ?year < 2019) .
+        ?Movie cinema:year ?_Year .
+        ?Movie cinema:directedBy ?Director .
+        ?Movie cinema:performedBy cinema:benedict_cumberbatch .
+        ?Movie cinema:performedBy cinema:keira_knightley .
+        BIND(xsd:integer(?_Year) as ?Year)
+    } order by asc(?Year)
+
+# Query 7:
+SELECT DISTINCT ?Actress ?Actor ?Movie ?Duration
+	WHERE { 
+        ?Movie a cinema:Movie .
+        ?Movie cinema:duration ?_Duration .
+        FILTER(?_Duration > 112 && ?_Duration < 115) . 
+        ?Movie cinema:performedBy ?Actor .
+        ?Actor a cinema:Actor .
+        ?Movie cinema:performedBy ?Actress .
+        ?Actress a cinema:Actress .
+        BIND(xsd:integer(?_Duration) as ?Duration)
+    } order by asc(UCASE(str(?Duration)))
+
+# Query 8:
+SELECT ?Director (COUNT(*) AS ?Qtd)
+	WHERE { 
+        ?movie a cinema:Movie . 
+        ?movie cinema:directedBy ?d . 
+        ?movie cinema:performedBy ?person . 
+        ?person foaf:firstName "Sofia" . 
+        ?person foaf:familyName "Coppola" . 
+        ?d foaf:firstName ?fname . 
+        ?d foaf:familyName ?lname .
+        BIND(concat(?fname, " ", ?lname) as ?Director)
+    } GROUP BY ?Director ORDER BY DESC(?Qtd) LIMIT 1
+
+# Query 9:
+SELECT ?Movie ?Year ?Character
+	WHERE { 
+        VALUES (?value) {(cinema:hasActor) (cinema:hasActress)}
+        ?Movie a cinema:Movie .
+        ?Movie cinema:performedBy cinema:sofia_coppola .
+        ?Movie cinema:year ?_Year . 
+        ?Movie cinema:hasRole ?role . 
+        ?role ?value cinema:sofia_coppola . 
+        ?role cinema:hasCharacter ?Character . 
+        BIND(xsd:integer(?_Year) as ?Year)
+    } order by asc(?Year) LIMIT 1
+
+# Query 10:
+SELECT ?Movie ?Duration
+	WHERE {
+        ?Movie a cinema:Movie .
+        ?Movie cinema:directedBy cinema:francis_ford_coppola .
+        ?Movie cinema:duration ?_Duration .
+        BIND(xsd:integer(?_Duration) as ?Duration)
+    } order by desc(?Duration) LIMIT 1

@@ -1,0 +1,195 @@
+Prefix(:=<http://www.semanticweb.org/davys/ontologies/2019/10/cinema#>)
+Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
+Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
+Prefix(xml:=<http://www.w3.org/XML/1998/namespace>)
+Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
+Prefix(foaf:=<http://xmlns.com/foaf/0.1/>)
+Prefix(obda:=<https://w3id.org/obda/vocabulary#>)
+Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
+
+
+Ontology(<http://www.semanticweb.org/davys/ontologies/2019/10/cinema>
+Import(<http://xmlns.com/foaf/0.1/>)
+
+Declaration(Class(<http://schema.org/CreativeWork>))
+Declaration(Class(:Actor))
+Declaration(Class(:Actress))
+Declaration(Class(:Character))
+Declaration(Class(:Director))
+Declaration(Class(:Man))
+Declaration(Class(:Movie))
+Declaration(Class(:Role))
+Declaration(Class(:Woman))
+Declaration(Class(<http://www.w3.org/2000/10/swap/pim/contact#Person>))
+Declaration(ObjectProperty(:actorOnRole))
+Declaration(ObjectProperty(:actressOnRole))
+Declaration(ObjectProperty(:characterOnRole))
+Declaration(ObjectProperty(:directedBy))
+Declaration(ObjectProperty(:directs))
+Declaration(ObjectProperty(:hasActor))
+Declaration(ObjectProperty(:hasActress))
+Declaration(ObjectProperty(:hasCharacter))
+Declaration(ObjectProperty(:hasRole))
+Declaration(ObjectProperty(:interpretedBy))
+Declaration(ObjectProperty(:interprets))
+Declaration(ObjectProperty(:onMovie))
+Declaration(ObjectProperty(:performedBy))
+Declaration(ObjectProperty(:performsOn))
+Declaration(DataProperty(:duration))
+Declaration(DataProperty(:year))
+############################
+#   Object Properties
+############################
+
+# Object Property: :actorOnRole (:actorOnRole)
+
+InverseObjectProperties(:actorOnRole :hasActor)
+ObjectPropertyDomain(:actorOnRole :Actor)
+ObjectPropertyRange(:actorOnRole :Role)
+
+# Object Property: :actressOnRole (:actressOnRole)
+
+InverseObjectProperties(:actressOnRole :hasActress)
+ObjectPropertyDomain(:actressOnRole :Actress)
+ObjectPropertyRange(:actressOnRole :Role)
+
+# Object Property: :characterOnRole (:characterOnRole)
+
+InverseObjectProperties(:characterOnRole :hasCharacter)
+ObjectPropertyDomain(:characterOnRole :Character)
+ObjectPropertyRange(:characterOnRole :Role)
+
+# Object Property: :directedBy (:directedBy)
+
+SubObjectPropertyOf(:directedBy <http://xmlns.com/foaf/0.1/made>)
+InverseObjectProperties(:directedBy :directs)
+ObjectPropertyRange(:directedBy :Director)
+
+# Object Property: :directs (:directs)
+
+SubObjectPropertyOf(:directs <http://xmlns.com/foaf/0.1/maker>)
+ObjectPropertyDomain(:directs :Director)
+ObjectPropertyRange(:directs :Movie)
+
+# Object Property: :hasActor (:hasActor)
+
+ObjectPropertyDomain(:hasActor :Role)
+ObjectPropertyRange(:hasActor :Actor)
+
+# Object Property: :hasActress (:hasActress)
+
+ObjectPropertyDomain(:hasActress :Role)
+ObjectPropertyRange(:hasActress :Actress)
+
+# Object Property: :hasCharacter (:hasCharacter)
+
+ObjectPropertyDomain(:hasCharacter :Role)
+ObjectPropertyRange(:hasCharacter :Character)
+
+# Object Property: :hasRole (:hasRole)
+
+InverseObjectProperties(:hasRole :onMovie)
+ObjectPropertyDomain(:hasRole :Movie)
+ObjectPropertyRange(:hasRole :Role)
+
+# Object Property: :interpretedBy (:interpretedBy)
+
+SubObjectPropertyOf(:interpretedBy <http://xmlns.com/foaf/0.1/made>)
+InverseObjectProperties(:interpretedBy :interprets)
+ObjectPropertyDomain(:interpretedBy :Character)
+ObjectPropertyRange(:interpretedBy ObjectUnionOf(:Actor :Actress))
+
+# Object Property: :interprets (:interprets)
+
+SubObjectPropertyOf(:interprets <http://xmlns.com/foaf/0.1/maker>)
+ObjectPropertyDomain(:interprets ObjectUnionOf(:Actor :Actress))
+ObjectPropertyRange(:interprets :Character)
+
+# Object Property: :onMovie (:onMovie)
+
+ObjectPropertyDomain(:onMovie :Role)
+
+# Object Property: :performedBy (:performedBy)
+
+SubObjectPropertyOf(:performedBy <http://xmlns.com/foaf/0.1/made>)
+InverseObjectProperties(:performedBy :performsOn)
+ObjectPropertyRange(:performedBy ObjectUnionOf(:Actor :Actress))
+
+# Object Property: :performsOn (:performsOn)
+
+SubObjectPropertyOf(:performsOn <http://xmlns.com/foaf/0.1/maker>)
+ObjectPropertyDomain(:performsOn ObjectUnionOf(:Actor :Actress))
+ObjectPropertyRange(:performsOn :Movie)
+
+
+############################
+#   Data Properties
+############################
+
+# Data Property: :duration (:duration)
+
+DataPropertyDomain(:duration :Movie)
+DataPropertyRange(:duration rdfs:Literal)
+
+# Data Property: :year (:year)
+
+DataPropertyDomain(:year :Movie)
+DataPropertyRange(:year rdfs:Literal)
+
+
+
+############################
+#   Classes
+############################
+
+# Class: <http://schema.org/CreativeWork> (<http://schema.org/CreativeWork>)
+
+DisjointClasses(<http://schema.org/CreativeWork> <http://www.w3.org/2000/10/swap/pim/contact#Person>)
+
+# Class: :Actor (:Actor)
+
+EquivalentClasses(:Actor ObjectIntersectionOf(:Man ObjectSomeValuesFrom(:performsOn :Movie)))
+SubClassOf(:Actor :Man)
+
+# Class: :Actress (:Actress)
+
+EquivalentClasses(:Actress ObjectIntersectionOf(:Woman ObjectSomeValuesFrom(:performsOn :Movie)))
+SubClassOf(:Actress :Woman)
+
+# Class: :Character (:Character)
+
+SubClassOf(:Character <http://schema.org/CreativeWork>)
+DisjointClasses(:Character :Movie)
+DisjointClasses(:Character <http://www.w3.org/2000/10/swap/pim/contact#Person>)
+
+# Class: :Director (:Director)
+
+EquivalentClasses(:Director ObjectUnionOf(:Man ObjectIntersectionOf(:Woman ObjectSomeValuesFrom(:directs :Movie))))
+SubClassOf(:Director <http://www.w3.org/2000/10/swap/pim/contact#Person>)
+SubClassOf(:Director ObjectUnionOf(:Man :Woman))
+
+# Class: :Man (:Man)
+
+SubClassOf(:Man <http://www.w3.org/2000/10/swap/pim/contact#Person>)
+DisjointClasses(:Man :Woman)
+
+# Class: :Movie (:Movie)
+
+SubClassOf(:Movie <http://schema.org/CreativeWork>)
+DisjointClasses(:Movie <http://www.w3.org/2000/10/swap/pim/contact#Person>)
+
+# Class: :Role (:Role)
+
+SubClassOf(:Role <http://schema.org/CreativeWork>)
+SubClassOf(:Role ObjectIntersectionOf(ObjectUnionOf(ObjectSomeValuesFrom(:hasActor :Actor) ObjectSomeValuesFrom(:hasActress :Actress)) ObjectSomeValuesFrom(:hasCharacter :Character)))
+
+# Class: :Woman (:Woman)
+
+SubClassOf(:Woman <http://www.w3.org/2000/10/swap/pim/contact#Person>)
+
+# Class: <http://www.w3.org/2000/10/swap/pim/contact#Person> (<http://www.w3.org/2000/10/swap/pim/contact#Person>)
+
+EquivalentClasses(<http://www.w3.org/2000/10/swap/pim/contact#Person> ObjectUnionOf(:Man :Woman))
+
+
+)
