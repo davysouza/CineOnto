@@ -38,4 +38,4 @@ For all classes and subclasses of `foaf:Person` we use the following **data prop
 ## References
 | Name | Link |
 | ------ | ------ |
-| FOAF Ontology | [http://xmlns.com/foaf/spec/][PlDb] |
+| FOAF Ontology | http://xmlns.com/foaf/spec/ |
